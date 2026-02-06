@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>流浪动物领养管理系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 60px; }
+        .animal-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">流浪动物领养</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#section-animals">动物列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#section-donation">爱心捐赠</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#section-my-applications">我的申请</a>
+                </li>
+            </ul>
+            <span class="navbar-text me-3" id="welcomeUser"></span>
+            <button class="btn btn-sm btn-outline-light" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <!-- 动物列表 -->
+    <section id="section-animals" class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>待领养动物</h2>
+            <div class="d-flex gap-2">
+                <select id="speciesFilter" class="form-select form-select-sm" style="width: 140px;">
+                    <option value="">全部种类</option>
+                    <option value="狗">狗</option>
+                    <option value="猫">猫</option>
+                    <option value="其他">其他</option>
+                </select>
+                <button class="btn btn-sm btn-primary" onclick="loadAnimals()">刷新</button>
+            </div>
+        </div>
+        <div id="animalList" class="row g-3">
+            <!-- 动物卡片渲染区域 -->
+        </div>
+    </section>
+
+    <!-- 爱心捐赠 -->
+    <section id="section-donation" class="mb-5">
+        <h2 class="mb-3">爱心捐赠</h2>
+        <div class="row g-4">
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header">提交捐赠</div>
+                    <div class="card-body">
+                        <form id="donationForm" onsubmit="submitDonation(event)">
+                            <div class="mb-3">
+                                <label class="form-label">捐赠人姓名（可选）</label>
+                                <input type="text" class="form-control" id="donorName">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">捐赠类型</label>
+                                <select class="form-select" id="donationType">
+                                    <option value="MONEY">资金捐赠</option>
+                                    <option value="ITEM">物资捐赠</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="amountGroup">
+                                <label class="form-label">金额（元）</label>
+                                <input type="number" step="0.01" class="form-control" id="amount">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">备注说明</label>
+                                <textarea class="form-control" id="donationRemark" rows="3"></textarea>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="publicFlag" checked>
+                                <label class="form-check-label" for="publicFlag">
+                                    同意公开捐赠信息（可匿名）
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">提交捐赠</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>捐赠公示</span>
+                        <button class="btn btn-sm btn-outline-primary" onclick="loadDonations()">刷新</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="donationList">
+                            <!-- 捐赠记录渲染区域 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 我的申请（通过页面输入的用户ID） -->
+    <section id="section-my-applications" class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>我的领养申请（示例）</h2>
+            <div class="d-flex align-items-center gap-2">
+                <label class="form-label mb-0 small">当前用户ID：</label>
+                <input type="number" id="currentUserId" class="form-control form-control-sm" style="width: 120px;"
+                       placeholder="请输入用户ID">
+                <button class="btn btn-sm btn-primary" onclick="loadMyApplications()">刷新</button>
+            </div>
+        </div>
+        <div id="applicationList">
+            <!-- 申请列表渲染区域 -->
+        </div>
+    </section>
+</main>
+
+<!-- 领养申请模态框 -->
+<div class="modal fade" id="adoptionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">申请领养：<span id="modalAnimalName"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="adoptionForm" onsubmit="submitAdoption(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="modalAnimalId">
+                    <div class="mb-3">
+                        <label class="form-label">申请理由</label>
+                        <textarea class="form-control" id="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">居住环境</label>
+                        <textarea class="form-control" id="homeEnv" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">养宠经验</label>
+                        <textarea class="form-control" id="experience" rows="2"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">是否已有其他宠物</label>
+                            <select class="form-select" id="hasOtherPet">
+                                <option value="false">否</option>
+                                <option value="true">是</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">收入水平（自评）</label>
+                            <select class="form-select" id="incomeLevel">
+                                <option value="">请选择</option>
+                                <option value="LOW">偏低</option>
+                                <option value="MIDDLE">中等</option>
+                                <option value="HIGH">较高</option>
+                            </select>
+                        </div>
+                    </div>
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">提交申请</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS & 依赖 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const API_BASE = '';
+
+    async function loadAnimals() {
+        const species = document.getElementById('speciesFilter').value;
+        const params = new URLSearchParams();
+        // 不再只看“待领养”，默认显示全部，可选按种类过滤
+        if (species) params.append('species', species);
+        params.append('page', '0');
+        params.append('size', '20');
+
+        const resp = await fetch(`${API_BASE}/api/animals?${params.toString()}`);
+        const page = await resp.json();
+        const list = document.getElementById('animalList');
+        list.innerHTML = '';
+
+        (page.content || []).forEach(a => {
+            const statusText = a.status || '未知';
+            let statusClass = 'secondary';
+            if (statusText === '待领养') statusClass = 'success';
+            else if (statusText === '领养中') statusClass = 'warning';
+            else if (statusText === '已领养') statusClass = 'secondary';
+            else if (statusText === '特别照顾') statusClass = 'danger';
+
+            const canApply = statusText === '待领养';
+            const actionBtn = canApply
+                ? `<button class="btn btn-primary mt-2" onclick="openAdoptionModal(${a.id}, '${a.name || ''}')">申请领养</button>`
+                : `<button class="btn btn-outline-secondary mt-2" disabled>${statusText}</button>`;
+
+            const col = document.createElement('div');
+            col.className = 'col-md-4';
+            col.innerHTML = `
+                <div class="card animal-card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">
+                            ${a.name || '未命名'}
+                            <small class="text-muted">(${a.species || ''})</small>
+                        </h5>
+                        <span class="badge bg-${statusClass} mb-2">${statusText}</span>
+                        <p class="card-text mb-1"><strong>品种：</strong>${a.breed || '-'}</p>
+                        <p class="card-text mb-1"><strong>年龄：</strong>${a.age ?? '-'} 月</p>
+                        <p class="card-text mb-1"><strong>健康：</strong>${a.healthStatus || '-'}</p>
+                        <p class="card-text small text-muted flex-grow-1">${(a.description || '').slice(0, 60)}...</p>
+                        ${actionBtn}
+                    </div>
+                </div>
+            `;
+            list.appendChild(col);
+        });
+    }
+
+    function openAdoptionModal(animalId, name) {
+        document.getElementById('modalAnimalId').value = animalId;
+        document.getElementById('modalAnimalName').textContent = name;
+        const modal = new bootstrap.Modal(document.getElementById('adoptionModal'));
+        modal.show();
+    }
+
+    async function submitAdoption(event) {
+        event.preventDefault();
+        const animalId = document.getElementById('modalAnimalId').value;
+        const applicantIdInput = document.getElementById('currentUserId').value.trim();
+
+        if (!applicantIdInput) {
+            alert('请先在“我的领养申请”区域输入当前用户ID，再提交申请。');
+            return;
+        }
+        const applicantId = Number(applicantIdInput);
+
+        const body = {
+            reason: document.getElementById('reason').value,
+            homeEnv: document.getElementById('homeEnv').value,
+            experience: document.getElementById('experience').value,
+            hasOtherPet: document.getElementById('hasOtherPet').value === 'true',
+            incomeLevel: document.getElementById('incomeLevel').value
+        };
+
+        const resp = await fetch(`${API_BASE}/api/adoptions/apply?applicantId=${applicantId}&animalId=${animalId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (resp.ok) {
+            alert('申请提交成功！');
+            bootstrap.Modal.getInstance(document.getElementById('adoptionModal')).hide();
+            document.getElementById('adoptionForm').reset();
+            loadMyApplications();
+        } else {
+            const text = await resp.text();
+            alert('申请失败：' + text);
+        }
+    }
+
+    async function submitDonation(event) {
+        event.preventDefault();
+        const body = {
+            donorName: document.getElementById('donorName').value || null,
+            type: document.getElementById('donationType').value,
+            amount: document.getElementById('donationType').value === 'MONEY'
+                ? Number(document.getElementById('amount').value || 0)
+                : null,
+            publicFlag: document.getElementById('publicFlag').checked,
+            remark: document.getElementById('donationRemark').value
+        };
+
+        const resp = await fetch(`${API_BASE}/api/donations`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (resp.ok) {
+            alert('感谢您的爱心捐赠！');
+            document.getElementById('donationForm').reset();
+            document.getElementById('donationType').value = 'MONEY';
+            loadDonations();
+        } else {
+            const text = await resp.text();
+            alert('提交失败：' + text);
+        }
+    }
+
+    async function loadDonations() {
+        const params = new URLSearchParams({ page: '0', size: '20' });
+        const resp = await fetch(`${API_BASE}/api/donations/public?${params.toString()}`);
+        const page = await resp.json();
+        const list = document.getElementById('donationList');
+        list.innerHTML = '';
+
+        (page.content || []).forEach(d => {
+            const div = document.createElement('div');
+            div.className = 'border-bottom py-2';
+            const donor = d.donorName || '爱心人士';
+            const typeText = d.type === 'MONEY'
+                ? `资金捐赠 ${d.amount ?? 0} 元`
+                : '物资捐赠';
+            div.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <strong>${donor}</strong> - ${typeText}
+                        <div class="small text-muted">${d.remark || ''}</div>
+                    </div>
+                    <div class="text-end small text-muted">
+                        <div>${d.status || ''}</div>
+                        <div>${(d.createTime || '').replace('T', ' ')}</div>
+                    </div>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    async function loadMyApplications() {
+        const applicantIdInput = document.getElementById('currentUserId').value.trim();
+        const list = document.getElementById('applicationList');
+        list.innerHTML = '';
+
+        if (!applicantIdInput) {
+            list.innerHTML = '<p class="text-muted">请先在上方输入用户ID，然后点击“刷新”。</p>';
+            return;
+        }
+
+        const applicantId = Number(applicantIdInput);
+        const params = new URLSearchParams({ applicantId, page: '0', size: '20' });
+        const resp = await fetch(`${API_BASE}/api/adoptions/my?${params.toString()}`);
+        const page = await resp.json();
+
+        if (!page.content || page.content.length === 0) {
+            list.innerHTML = '<p class="text-muted">暂无申请记录。</p>';
+            return;
+        }
+
+        const table = document.createElement('table');
+        table.className = 'table table-striped';
+        table.innerHTML = `
+            <thead>
+            <tr>
+                <th>申请ID</th>
+                <th>动物</th>
+                <th>状态</th>
+                <th>评分</th>
+                <th>提交时间</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        `;
+        const tbody = table.querySelector('tbody');
+
+        page.content.forEach(app => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${app.id}</td>
+                <td>${app.animalName || '-'}</td>
+                <td>${app.status || ''}</td>
+                <td>${app.score ?? '-'}</td>
+                <td>${(app.createTime || '').replace('T', ' ')}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        list.appendChild(table);
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+        // 从本地存储恢复登录信息
+        const uid = localStorage.getItem('currentUserId');
+        const uname = localStorage.getItem('currentUsername');
+        const utype = localStorage.getItem('currentUserType') || '';
+        if (uid) {
+            const input = document.getElementById('currentUserId');
+            if (input) input.value = uid;
+        }
+        const welcome = document.getElementById('welcomeUser');
+        if (welcome && uname) {
+            welcome.textContent = `欢迎，${uname}${utype ? '（' + utype + '）' : ''}`;
+        }
+
+        loadAnimals();
+        loadDonations();
+
+        // 切换捐赠类型时控制金额输入显隐
+        document.getElementById('donationType').addEventListener('change', (e) => {
+            const amountGroup = document.getElementById('amountGroup');
+            if (e.target.value === 'MONEY') {
+                amountGroup.style.display = '';
+            } else {
+                amountGroup.style.display = 'none';
+            }
+        });
+    });
+
+    function logout() {
+        localStorage.removeItem('currentUserId');
+        localStorage.removeItem('currentUsername');
+        localStorage.removeItem('currentUserType');
+        window.location.href = '/login.html';
+    }
+</script>
+</body>
+</html>
+

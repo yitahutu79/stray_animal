@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>宠物信息管理 - 流浪动物领养系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">宠物信息管理</a>
+        <div class="d-flex gap-2">
+            <a href="/index.html" class="btn btn-sm btn-outline-light">前台首页</a>
+            <a href="/admin.html" class="btn btn-sm btn-outline-light">申请审核</a>
+            <button class="btn btn-sm btn-outline-light" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-4">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">新增 / 编辑动物档案</div>
+                <div class="card-body">
+                    <form id="animalForm" onsubmit="saveAnimal(event)">
+                        <input type="hidden" id="animalId">
+                        <div class="mb-2">
+                            <label class="form-label">名称</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">种类</label>
+                            <select class="form-select" id="species">
+                                <option value="狗">狗</option>
+                                <option value="猫">猫</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">品种</label>
+                            <input type="text" class="form-control" id="breed">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">性别</label>
+                            <select class="form-select" id="gender">
+                                <option value="公">公</option>
+                                <option value="母">母</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-2">
+                                <label class="form-label">年龄（月）</label>
+                                <input type="number" class="form-control" id="age">
+                            </div>
+                            <div class="col-6 mb-2">
+                                <label class="form-label">体重（kg）</label>
+                                <input type="number" step="0.1" class="form-control" id="weight">
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">颜色</label>
+                            <input type="text" class="form-control" id="color">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">健康状况</label>
+                            <input type="text" class="form-control" id="healthStatus">
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="vaccinated">
+                                    <label class="form-check-label" for="vaccinated">已免疫</label>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="neutered">
+                                    <label class="form-check-label" for="neutered">已绝育</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">性格特点</label>
+                            <input type="text" class="form-control" id="characterFeature">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="status">
+                                <option value="待领养">待领养</option>
+                                <option value="领养中">领养中</option>
+                                <option value="已领养">已领养</option>
+                                <option value="特别照顾">特别照顾</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">详细描述</label>
+                            <textarea class="form-control" id="description" rows="3"></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-grow-1">保存</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">清空</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>动物列表</span>
+                    <div class="d-flex gap-2">
+                        <select id="listStatus" class="form-select form-select-sm" style="width: 150px;">
+                            <option value="">全部状态</option>
+                            <option value="待领养">待领养</option>
+                            <option value="领养中">领养中</option>
+                            <option value="已领养">已领养</option>
+                            <option value="特别照顾">特别照顾</option>
+                        </select>
+                        <button class="btn btn-sm btn-outline-primary" onclick="loadAnimals()">刷新</button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle mb-0">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>种类</th>
+                                <th>品种</th>
+                                <th>状态</th>
+                                <th>年龄</th>
+                                <th>健康</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody id="animalTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const API_BASE = '';
+
+    async function loadAnimals() {
+        const status = document.getElementById('listStatus').value;
+        const params = new URLSearchParams({ page: '0', size: '50' });
+        if (status) params.append('status', status);
+        const resp = await fetch(`${API_BASE}/api/animals?${params.toString()}`);
+        const page = await resp.json();
+        const tbody = document.getElementById('animalTableBody');
+        tbody.innerHTML = '';
+        (page.content || []).forEach(a => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${a.id}</td>
+                <td>${a.name}</td>
+                <td>${a.species || ''}</td>
+                <td>${a.breed || ''}</td>
+                <td>${a.status || ''}</td>
+                <td>${a.age ?? '-'}</td>
+                <td>${a.healthStatus || ''}</td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" onclick='editAnimal(${JSON.stringify(a).replace(/'/g, "&apos;")})'>编辑</button>
+                    <button class="btn btn-outline-danger" onclick="deleteAnimal(${a.id})">删除</button>
+                  </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function editAnimal(a) {
+        document.getElementById('animalId').value = a.id;
+        document.getElementById('name').value = a.name || '';
+        document.getElementById('species').value = a.species || '狗';
+        document.getElementById('breed').value = a.breed || '';
+        document.getElementById('gender').value = a.gender || '公';
+        document.getElementById('age').value = a.age ?? '';
+        document.getElementById('weight').value = a.weight ?? '';
+        document.getElementById('color').value = a.color || '';
+        document.getElementById('healthStatus').value = a.healthStatus || '';
+        document.getElementById('vaccinated').checked = !!a.vaccinated;
+        document.getElementById('neutered').checked = !!a.neutered;
+        document.getElementById('characterFeature').value = a.characterFeature || '';
+        document.getElementById('status').value = a.status || '待领养';
+        document.getElementById('description').value = a.description || '';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+        document.getElementById('animalForm').reset();
+        document.getElementById('animalId').value = '';
+    }
+
+    async function saveAnimal(event) {
+        event.preventDefault();
+        const id = document.getElementById('animalId').value;
+        const body = {
+            name: document.getElementById('name').value,
+            species: document.getElementById('species').value,
+            breed: document.getElementById('breed').value,
+            gender: document.getElementById('gender').value,
+            age: document.getElementById('age').value ? Number(document.getElementById('age').value) : null,
+            weight: document.getElementById('weight').value ? Number(document.getElementById('weight').value) : null,
+            color: document.getElementById('color').value,
+            healthStatus: document.getElementById('healthStatus').value,
+            vaccinated: document.getElementById('vaccinated').checked,
+            neutered: document.getElementById('neutered').checked,
+            characterFeature: document.getElementById('characterFeature').value,
+            status: document.getElementById('status').value,
+            description: document.getElementById('description').value
+        };
+        let url = `${API_BASE}/api/animals`;
+        let method = 'POST';
+        if (id) {
+            url = `${API_BASE}/api/animals/${id}`;
+            method = 'PUT';
+        }
+        const resp = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if (resp.ok) {
+            alert('保存成功');
+            resetForm();
+            loadAnimals();
+        } else {
+            const text = await resp.text();
+            alert('保存失败：' + text);
+        }
+    }
+
+    async function deleteAnimal(id) {
+        if (!confirm(`确认删除动物 #${id} 吗？`)) return;
+        const resp = await fetch(`${API_BASE}/api/animals/${id}`, { method: 'DELETE' });
+        if (resp.ok) {
+            alert('删除成功');
+            loadAnimals();
+        } else {
+            const text = await resp.text();
+            alert('删除失败：' + text);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadAnimals();
+    });
+
+    function logout() {
+        localStorage.removeItem('currentUserId');
+        localStorage.removeItem('currentUsername');
+        localStorage.removeItem('currentUserType');
+        window.location.href = '/login.html';
+    }
+</script>
+</body>
+</html>
+
