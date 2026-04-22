@@ -27,10 +27,9 @@ public class AdoptionFollowupController {
      * 查看某条领养申请的所有回访记录
      */
     @GetMapping("/{applicationId}/followups")
-    public Page<AdoptionFollowup> listFollowups(@PathVariable Long applicationId,
-                                                @RequestParam(defaultValue = "0") int page,
-                                                @RequestParam(defaultValue = "10") int size) {
+    public Page<AdoptionFollowupDTO> listFollowups(@PathVariable Long applicationId,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "10") int size) {
         return followupService.listByApplication(applicationId, page, size);
     }
 }
-

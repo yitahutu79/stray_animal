@@ -8,4 +8,3 @@ public interface DonationUsageRepository extends JpaRepository<DonationUsage, Lo
 
     Page<DonationUsage> findByDonation_Id(Long donationId, Pageable pageable);
 }
-

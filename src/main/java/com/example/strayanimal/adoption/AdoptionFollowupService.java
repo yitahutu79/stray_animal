@@ -40,9 +40,9 @@ public class AdoptionFollowupService {
         return followupRepository.save(f);
     }
 
-    public Page<AdoptionFollowup> listByApplication(Long applicationId, int page, int size) {
+    public Page<AdoptionFollowupDTO> listByApplication(Long applicationId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return followupRepository.findByApplication_Id(applicationId, pageable);
+        return followupRepository.findByApplication_Id(applicationId, pageable)
+                .map(AdoptionFollowupDTO::fromEntity);
     }
 }
-

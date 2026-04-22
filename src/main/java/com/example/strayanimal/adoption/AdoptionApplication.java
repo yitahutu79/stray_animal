@@ -5,11 +5,6 @@ import com.example.strayanimal.common.BaseEntity;
 import com.example.strayanimal.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 @Entity
 @Table(name = "adoption_application")
 public class AdoptionApplication extends BaseEntity {
@@ -49,5 +44,92 @@ public class AdoptionApplication extends BaseEntity {
 
     @Lob
     private String rejectReason;
-}
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getApplicant() {
+        return applicant;
+    }
+
+    public void setApplicant(User applicant) {
+        this.applicant = applicant;
+    }
+
+    public Animal getAnimal() {
+        return animal;
+    }
+
+    public void setAnimal(Animal animal) {
+        this.animal = animal;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public String getHomeEnv() {
+        return homeEnv;
+    }
+
+    public void setHomeEnv(String homeEnv) {
+        this.homeEnv = homeEnv;
+    }
+
+    public Boolean getHasOtherPet() {
+        return hasOtherPet;
+    }
+
+    public void setHasOtherPet(Boolean hasOtherPet) {
+        this.hasOtherPet = hasOtherPet;
+    }
+
+    public String getIncomeLevel() {
+        return incomeLevel;
+    }
+
+    public void setIncomeLevel(String incomeLevel) {
+        this.incomeLevel = incomeLevel;
+    }
+
+    public String getExperience() {
+        return experience;
+    }
+
+    public void setExperience(String experience) {
+        this.experience = experience;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+
+    public String getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
+}

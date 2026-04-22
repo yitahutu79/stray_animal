@@ -5,85 +5,317 @@
     <title>捐赠管理 - 流浪动物领养系统</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #2f241d;
+            --muted: #76685d;
+            --line: rgba(80, 57, 40, 0.12);
+            --paper: rgba(255, 255, 255, 0.96);
+            --accent: #2f6f61;
+            --warm: #c8672e;
+            --navy: #355a74;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(53, 90, 116, 0.14), transparent 24%),
+                linear-gradient(180deg, #fcf8f2 0%, #f1ebe4 100%);
+            color: var(--ink);
+        }
+
+        .topbar {
+            background: rgba(28, 24, 21, 0.88);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero,
+        .panel-card,
+        .metric-card {
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            background: var(--paper);
+            box-shadow: 0 18px 38px rgba(73, 49, 31, 0.08);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, rgba(53, 90, 116, 0.96), rgba(47, 111, 97, 0.95));
+            color: #fff;
+        }
+
+        .metric-card {
+            padding: 1.15rem;
+            height: 100%;
+        }
+
+        .metric-card .value {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .panel-card {
+            padding: 1.35rem;
+        }
+
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .section-desc {
+            color: var(--muted);
+        }
+
+        .table-shell {
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .table thead th {
+            background: #f7f1ea;
+            color: #5a4b3f;
+            border-bottom-width: 1px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.34rem 0.72rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .tag-money { background: rgba(47, 111, 97, 0.14); color: var(--accent); }
+        .tag-item { background: rgba(223, 161, 78, 0.18); color: #92610b; }
+        .tag-pending { background: rgba(200, 103, 46, 0.14); color: var(--warm); }
+        .tag-confirmed { background: rgba(53, 90, 116, 0.14); color: var(--navy); }
+        .tag-used { background: rgba(47, 111, 97, 0.18); color: var(--accent); }
+
+        .usage-preview {
+            border: 1px dashed var(--line);
+            border-radius: 18px;
+            padding: 1rem;
+            background: rgba(255,255,255,0.72);
+            color: var(--muted);
+        }
+    </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark topbar">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">捐赠管理</a>
+        <a class="navbar-brand" href="#">捐赠管理中心</a>
         <div class="d-flex gap-2">
-            <a href="/index.html" class="btn btn-sm btn-outline-light">前台首页</a>
+            <a href="/stats.html" class="btn btn-sm btn-outline-light">统计分析</a>
             <a href="/admin.html" class="btn btn-sm btn-outline-light">申请审核</a>
+            <a href="/pet-admin.html" class="btn btn-sm btn-outline-light">宠物管理</a>
+            <a href="/index.html" class="btn btn-sm btn-outline-light">前台首页</a>
             <button class="btn btn-sm btn-outline-light" onclick="logout()">退出登录</button>
         </div>
     </div>
 </nav>
 
 <main class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>捐赠记录管理</h2>
-        <button class="btn btn-sm btn-primary" onclick="loadDonations()">刷新</button>
+    <section class="hero p-4 mb-4">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-8">
+                <div class="small text-uppercase mb-2" style="letter-spacing: 0.16em;">Donation Ops</div>
+                <h1 class="h2 mb-3">让捐赠管理页看起来像一个透明、可靠的公益后台。</h1>
+                <p class="mb-0" style="color: rgba(255,255,255,0.82);">
+                    这里不只是查看流水，还要帮助工作人员快速判断资金 / 物资结构、待确认记录和已使用进度。
+                </p>
+            </div>
+            <div class="col-lg-4">
+                <div class="panel-card">
+                    <div class="section-title mb-1">实时同步捐赠记录</div>
+                    <div class="section-desc mb-3">建议在确认收捐或完成使用记录后刷新一次，保证对外公示和后台状态一致。</div>
+                    <button class="btn btn-primary w-100" onclick="loadDonations()">刷新记录</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="text-muted">记录总数</div>
+                <div class="value" id="metricTotal">0</div>
+                <div class="small text-muted">资金与物资合计</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="text-muted">资金捐赠额</div>
+                <div class="value" id="metricMoney">¥0</div>
+                <div class="small text-muted">当前列表汇总</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="text-muted">待确认记录</div>
+                <div class="value" id="metricPending">0</div>
+                <div class="small text-muted">优先处理入账确认</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="text-muted">已使用记录</div>
+                <div class="value" id="metricUsed">0</div>
+                <div class="small text-muted">用于展示执行进度</div>
+            </div>
+        </div>
     </div>
 
-    <div id="donationAdminAlert"></div>
+    <section class="panel-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+            <div>
+                <div class="section-title">捐赠记录管理</div>
+                <div class="section-desc">通过标签、金额和状态分层，让这张表更容易扫读。标记“已使用”时可以同步登记真实去向并对前台公开。</div>
+            </div>
+        </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>捐赠人</th>
-                <th>类型</th>
-                <th>金额</th>
-                <th>状态</th>
-                <th>公开</th>
-                <th>备注</th>
-                <th>时间</th>
-                <th>操作</th>
-            </tr>
-            </thead>
-            <tbody id="donationAdminBody"></tbody>
-        </table>
-    </div>
+        <div id="donationAdminAlert" class="mb-3"></div>
+
+        <div class="table-shell">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                    <tr>
+                        <th>记录</th>
+                        <th>捐赠人</th>
+                        <th>类型</th>
+                        <th>金额</th>
+                        <th>状态</th>
+                        <th>公开</th>
+                        <th>备注</th>
+                        <th>时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="donationAdminBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
 </main>
 
+<div class="modal fade" id="usageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">登记资金去向并标记已使用</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="usageForm" onsubmit="submitUsage(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="usageDonationId">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">去向项目名称</label>
+                            <input type="text" class="form-control" id="usageProjectName" placeholder="例如：糖糖复查与营养护理" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">对应动物（可选）</label>
+                            <select class="form-select" id="usageAnimalId">
+                                <option value="">不绑定具体动物</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">使用时间</label>
+                            <input type="datetime-local" class="form-control" id="usageTime">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">展示图片 URL（可选）</label>
+                            <input type="url" class="form-control" id="usagePhotoUrl" placeholder="https://...">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">使用说明</label>
+                            <textarea class="form-control" id="usageDesc" rows="4" placeholder="例如：用于复查、消炎药、营养膏与住院护理支出" required></textarea>
+                        </div>
+                    </div>
+                    <div class="usage-preview mt-3">
+                        登记后，这条去向会出现在前台“资金去向”动态区域，方便对外公开说明每笔捐赠最终用到了哪里。
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">登记并标记已使用</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const API_BASE = '';
+    let usageModal;
+
+    function formatMoney(value) {
+        return `¥${Number(value || 0).toLocaleString('zh-CN', { maximumFractionDigits: 0 })}`;
+    }
+
+    function formatDateTime(value) {
+        return value ? value.replace('T', ' ') : '-';
+    }
+
+    function getTypeTag(type) {
+        return type === 'ITEM'
+            ? '<span class="tag tag-item">物资捐赠</span>'
+            : '<span class="tag tag-money">资金捐赠</span>';
+    }
+
+    function getStatusTag(status) {
+        if (status === 'USED') return '<span class="tag tag-used">已使用</span>';
+        if (status === 'CONFIRMED') return '<span class="tag tag-confirmed">已确认</span>';
+        return '<span class="tag tag-pending">待确认</span>';
+    }
 
     async function loadDonations() {
-        const params = new URLSearchParams({ page: '0', size: '50' });
-        const resp = await fetch(`${API_BASE}/api/donations/admin?${params.toString()}`);
+        const resp = await fetch(`${API_BASE}/api/donations/admin?page=0&size=50`);
         const alertDiv = document.getElementById('donationAdminAlert');
         const tbody = document.getElementById('donationAdminBody');
         tbody.innerHTML = '';
         alertDiv.innerHTML = '';
 
         if (!resp.ok) {
-            const text = await resp.text();
-            alertDiv.innerHTML = `<div class="alert alert-danger">加载失败：${text}</div>`;
+            alertDiv.innerHTML = `<div class="alert alert-danger">加载失败：${await resp.text()}</div>`;
             return;
         }
 
         const page = await resp.json();
-        if (!page.content || page.content.length === 0) {
+        const items = page.content || [];
+
+        document.getElementById('metricTotal').textContent = items.length;
+        document.getElementById('metricMoney').textContent = formatMoney(
+            items.filter((item) => item.type === 'MONEY').reduce((sum, item) => sum + Number(item.amount || 0), 0)
+        );
+        document.getElementById('metricPending').textContent = items.filter((item) => item.status === 'PENDING').length;
+        document.getElementById('metricUsed').textContent = items.filter((item) => item.status === 'USED').length;
+
+        if (items.length === 0) {
             alertDiv.innerHTML = '<div class="alert alert-info">暂无捐赠记录。</div>';
             return;
         }
 
-        page.content.forEach(d => {
+        items.forEach((donation) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${d.id}</td>
-                <td>${d.donorName || '爱心人士'}</td>
-                <td>${d.type}</td>
-                <td>${d.type === 'MONEY' ? (d.amount ?? 0) : '-'}</td>
-                <td>${d.status}</td>
-                <td>${d.publicFlag ? '是' : '否'}</td>
-                <td class="small" style="max-width: 200px;">${d.remark || ''}</td>
-                <td>${(d.createTime || '').replace('T',' ')}</td>
+                <td><strong>#${donation.id}</strong></td>
                 <td>
-                    <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-success" onclick="updateStatus(${d.id}, 'CONFIRMED')">确认</button>
-                        <button class="btn btn-outline-primary" onclick="updateStatus(${d.id}, 'USED')">标记已使用</button>
+                    <strong>${donation.donorName || '爱心人士'}</strong>
+                </td>
+                <td>${getTypeTag(donation.type)}</td>
+                <td>${donation.type === 'MONEY' ? formatMoney(donation.amount) : '-'}</td>
+                <td>${getStatusTag(donation.status || 'PENDING')}</td>
+                <td>${donation.publicFlag ? '公开' : '不公开'}</td>
+                <td class="small text-muted">${donation.remark || '暂无备注'}</td>
+                <td class="small text-muted">${formatDateTime(donation.createTime)}</td>
+                <td>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-sm btn-outline-success" onclick="updateStatus(${donation.id}, 'CONFIRMED')">确认</button>
+                        <button class="btn btn-sm btn-outline-primary" onclick="openUsageModal(${donation.id})">登记去向并使用</button>
                     </div>
                 </td>
             `;
@@ -93,19 +325,76 @@
 
     async function updateStatus(id, status) {
         if (!confirm(`确认将捐赠 #${id} 标记为 ${status} 吗？`)) return;
-        const resp = await fetch(`${API_BASE}/api/donations/${id}/status?status=${status}`, {
-            method: 'PUT'
-        });
+        const resp = await fetch(`${API_BASE}/api/donations/${id}/status?status=${status}`, { method: 'PUT' });
         if (resp.ok) {
             alert('状态已更新');
             loadDonations();
         } else {
-            const text = await resp.text();
-            alert('操作失败：' + text);
+            alert(`操作失败：${await resp.text()}`);
         }
     }
 
+    async function loadAnimalsForUsage() {
+        const resp = await fetch(`${API_BASE}/api/animals?page=0&size=100`);
+        if (!resp.ok) return;
+        const page = await resp.json();
+        const select = document.getElementById('usageAnimalId');
+        select.innerHTML = '<option value="">不绑定具体动物</option>';
+        (page.content || []).forEach((animal) => {
+            const option = document.createElement('option');
+            option.value = animal.id;
+            option.textContent = `${animal.name}（${animal.status || '未知状态'}）`;
+            select.appendChild(option);
+        });
+    }
+
+    function openUsageModal(donationId) {
+        document.getElementById('usageForm').reset();
+        document.getElementById('usageDonationId').value = donationId;
+        document.getElementById('usageTime').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        usageModal.show();
+    }
+
+    async function submitUsage(event) {
+        event.preventDefault();
+        const donationId = document.getElementById('usageDonationId').value;
+        const animalId = document.getElementById('usageAnimalId').value;
+        const usageBody = {
+            projectName: document.getElementById('usageProjectName').value.trim(),
+            useTime: document.getElementById('usageTime').value ? `${document.getElementById('usageTime').value}:00` : null,
+            useDesc: document.getElementById('usageDesc').value.trim(),
+            photoUrl: document.getElementById('usagePhotoUrl').value.trim() || null,
+            animal: animalId ? { id: Number(animalId) } : null
+        };
+
+        const usageResp = await fetch(`${API_BASE}/api/donations/${donationId}/usages`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(usageBody)
+        });
+
+        if (!usageResp.ok) {
+            alert(`登记去向失败：${await usageResp.text()}`);
+            return;
+        }
+
+        const statusResp = await fetch(`${API_BASE}/api/donations/${donationId}/status?status=USED`, {
+            method: 'PUT'
+        });
+
+        if (!statusResp.ok) {
+            alert(`已登记去向，但更新状态失败：${await statusResp.text()}`);
+            return;
+        }
+
+        alert('已登记去向并标记为已使用');
+        usageModal.hide();
+        loadDonations();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+        usageModal = new bootstrap.Modal(document.getElementById('usageModal'));
+        loadAnimalsForUsage();
         loadDonations();
     });
 
@@ -118,4 +407,3 @@
 </script>
 </body>
 </html>
-

@@ -20,10 +20,15 @@ public class AnimalService {
 
     public Page<Animal> list(String status, String species, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        if (status != null && species != null) {
-            return animalRepository.findByStatusAndSpecies(status, species, pageable);
-        } else if (status != null) {
-            return animalRepository.findByStatus(status, pageable);
+        String normalizedStatus = status != null && !status.trim().isEmpty() ? status.trim() : null;
+        String normalizedSpecies = species != null && !species.trim().isEmpty() ? species.trim() : null;
+
+        if (normalizedStatus != null && normalizedSpecies != null) {
+            return animalRepository.findByStatusAndSpecies(normalizedStatus, normalizedSpecies, pageable);
+        } else if (normalizedStatus != null) {
+            return animalRepository.findByStatus(normalizedStatus, pageable);
+        } else if (normalizedSpecies != null) {
+            return animalRepository.findBySpecies(normalizedSpecies, pageable);
         } else {
             return animalRepository.findAll(pageable);
         }
@@ -41,4 +46,3 @@ public class AnimalService {
         animalRepository.deleteById(id);
     }
 }
-

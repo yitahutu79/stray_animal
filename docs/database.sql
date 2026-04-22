@@ -148,10 +148,6 @@ INSERT INTO `user` (username, password, real_name, user_type, status)
 VALUES ('adopter1', 'test', '测试领养人', 'ADOPTER', 'ENABLED');
 
 -- 插入测试动物数据
-INSERT INTO `animal` (`name`, `species`, `breed`, `gender`, `age`, `weight`, `color`, `health_status`, `vaccinated`, `neutered`, `character_feature`, `status`, `description`) VALUES
-('小白', '狗', '金毛', '公', 24, 25.5, '金黄色', '健康', 1, 1, '温顺、友好、喜欢和人互动', '待领养', '这是一只非常温顺的金毛，已经完成免疫和绝育，适合有经验的家庭领养。'),
-('小花', '猫', '橘猫', '母', 12, 4.2, '橘白相间', '健康', 1, 1, '活泼、亲人、喜欢玩耍', '待领养', '小花是一只活泼可爱的橘猫，已经完成免疫和绝育，适合有小孩的家庭。');
-
 
 INSERT INTO animal
 (name, species, breed, gender, age, weight, color, health_status,

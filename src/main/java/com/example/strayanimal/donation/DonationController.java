@@ -41,6 +41,13 @@ public class DonationController {
         return donationService.listAdmin(page, size);
     }
 
+    @GetMapping("/my")
+    public Page<DonationSummaryDTO> listMy(@RequestParam Long donorId,
+                                           @RequestParam(defaultValue = "0") int page,
+                                           @RequestParam(defaultValue = "10") int size) {
+        return donationService.listMyDonations(donorId, page, size);
+    }
+
     /**
      * 后台更新捐赠状态（确认/已使用等）
      */
@@ -63,10 +70,15 @@ public class DonationController {
      * 查看某条捐赠的使用明细（追溯）
      */
     @GetMapping("/{donationId}/usages")
-    public Page<DonationUsage> listUsages(@PathVariable Long donationId,
-                                          @RequestParam(defaultValue = "0") int page,
-                                          @RequestParam(defaultValue = "10") int size) {
+    public Page<DonationUsageDTO> listUsages(@PathVariable Long donationId,
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "10") int size) {
         return donationService.listUsageByDonation(donationId, page, size);
     }
-}
 
+    @GetMapping("/usages/recent")
+    public Page<DonationUsageDTO> listRecentUsages(@RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "6") int size) {
+        return donationService.listRecentUsages(page, size);
+    }
+}

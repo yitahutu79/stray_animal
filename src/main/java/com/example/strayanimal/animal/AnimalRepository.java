@@ -8,8 +8,9 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
 
     Page<Animal> findByStatus(String status, Pageable pageable);
 
+    Page<Animal> findBySpecies(String species, Pageable pageable);
+
     Page<Animal> findByStatusAndSpecies(String status, String species, Pageable pageable);
 
     long countByStatus(String status);
 }
-

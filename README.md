@@ -126,22 +126,20 @@ static/
 ## 文档一览
 
 项目附带以下文档（位于 `docs/` 目录）：
-
-- `数据库设计文档.md`：数据库概念结构、逻辑结构、数据字典。
 - `database.sql`：完整数据库建表脚本及部分初始化数据。
-- `API接口文档.md`：所有 REST API 的详细说明及示例。
-- `部署说明文档.md`：开发/生产环境部署步骤。
-- `操作说明文档.md`：面向“领养者”和“管理员”的使用指南。
-- `页面说明文档.md`：各 HTML 页面结构与功能说明。
-- `代码说明文档.md`：主要包和类的职责说明、关键业务流程说明。
 
 ---
 
 ## 快速运行
 
 1. 安装并启动 MySQL，执行 `docs/database.sql` 初始化数据库（或手动建库后由 JPA 自动建表）。
-2. 修改 `src/main/resources/application.yml` 中的数据库连接。
-3. 在项目根目录执行：
+mysql -u root -p 输入密码：root（密码在`application.yml` 中配置）
+（如果没有创建数据库就执行下面的命令，创建过数据库就跳过此步骤）
+CREATE DATABASE IF NOT EXISTS stray_animal_db;
+USE stray_animal_db;
+SOURCE /Users/lijie/Desktop/work/stray_animal/docs/database.sql;
+
+2. 在项目根目录执行：
 
 ```bash
 mvn clean install
@@ -152,9 +150,5 @@ mvn spring-boot:run
 
 ---
 
-## 更多说明
 
-- 评分规则、系统评价逻辑见 `AdoptionScoreCalculator` 和 `AdoptionEvaluationUtil`。
-- 统计逻辑见 `StatsService`，可按需要扩展更多维度。
-- 当前登录逻辑为演示用途，仅按用户名识别角色，密码与真正鉴权逻辑可在此基础上增加（如 Spring Security + JWT）。
 
