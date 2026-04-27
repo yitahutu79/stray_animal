@@ -34,21 +34,27 @@ public class DonationService {
         Donation donation = new Donation();
         String requestedName = req.getDonorName() == null ? null : req.getDonorName().trim();
         boolean hasRequestedName = requestedName != null && !requestedName.isEmpty();
-        if (donorId != null) {
+        
+        // 优先根据是否匿名（publicFlag）来决定存入的 donorName
+        boolean isAnonymous = Boolean.FALSE.equals(req.getPublicFlag());
+
+        if (isAnonymous) {
+            donation.setDonorName("爱心人士");
+        } else if (hasRequestedName) {
+            donation.setDonorName(requestedName);
+        } else if (donorId != null) {
             User donor = userRepository.findById(donorId)
                     .orElseThrow(() -> new IllegalArgumentException("捐赠人不存在"));
             donation.setDonor(donor);
-            if (hasRequestedName) {
-                donation.setDonorName(requestedName);
-            } else {
-                String fallbackName = donor.getRealName() != null && !donor.getRealName().trim().isEmpty()
-                        ? donor.getRealName().trim()
-                        : donor.getUsername();
-                donation.setDonorName(fallbackName);
-            }
+            String fallbackName = donor.getRealName() != null && !donor.getRealName().trim().isEmpty()
+                    ? donor.getRealName().trim()
+                    : donor.getUsername();
+            donation.setDonorName(fallbackName);
         } else {
-            donation.setDonorName(hasRequestedName ? requestedName : null);
+            donation.setDonorName("爱心人士");
         }
+
+        donation.setDonor(donorId != null ? userRepository.getReferenceById(donorId) : null);
         donation.setType(req.getType());
         donation.setAmount(req.getAmount());
         donation.setPublicFlag(req.getPublicFlag() != null ? req.getPublicFlag() : Boolean.TRUE);
