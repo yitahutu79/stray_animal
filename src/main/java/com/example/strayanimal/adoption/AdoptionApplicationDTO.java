@@ -10,13 +10,15 @@ public class AdoptionApplicationDTO {
     private String animalName;
     private String status;
     private Integer score;
+    private String rejectReason;
     private LocalDateTime createTime;
 
-    public AdoptionApplicationDTO(Long id, String animalName, String status, Integer score, LocalDateTime createTime) {
+    public AdoptionApplicationDTO(Long id, String animalName, String status, Integer score, String rejectReason, LocalDateTime createTime) {
         this.id = id;
         this.animalName = animalName;
         this.status = status;
         this.score = score;
+        this.rejectReason = rejectReason;
         this.createTime = createTime;
     }
 
@@ -28,6 +30,7 @@ public class AdoptionApplicationDTO {
                 animalName,
                 app.getStatus(),
                 app.getScore(),
+                app.getRejectReason(),
                 app.getCreateTime()
         );
     }
@@ -40,6 +43,8 @@ public class AdoptionApplicationDTO {
     public void setStatus(String status) { this.status = status; }
     public Integer getScore() { return score; }
     public void setScore(Integer score) { this.score = score; }
+    public String getRejectReason() { return rejectReason; }
+    public void setRejectReason(String rejectReason) { this.rejectReason = rejectReason; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 }

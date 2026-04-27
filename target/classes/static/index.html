@@ -1248,6 +1248,7 @@
                     <th>状态</th>
                     <th>评分</th>
                     <th>提交时间</th>
+                    <th>原因</th>
                     <th>回访</th>
                 </tr>
                 </thead>
@@ -1264,6 +1265,7 @@
                 <td>${app.status || '-'}</td>
                 <td>${app.score ?? '-'}</td>
                 <td>${formatDateTime(app.createTime)}</td>
+                <td>${app.status === 'REJECTED' ? (app.rejectReason || '无') : '无'}</td>
                 <td>
                     ${app.status === 'APPROVED'
                         ? `<button class="btn btn-sm btn-outline-primary" onclick="openMyFollowupModal(${app.id}, '${(app.animalName || '该动物').replace(/'/g, '&#39;')}')">查看回访</button>`

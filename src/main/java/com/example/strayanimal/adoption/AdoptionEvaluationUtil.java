@@ -21,7 +21,8 @@ public class AdoptionEvaluationUtil {
         }
 
         // 养宠经验
-        if (app.getExperience() != null && !app.getExperience().isBlank()) {
+        String experience = app.getExperience();
+        if (experience != null && !experience.isBlank() && !experience.equals("无经验")) {
             sb.append("申请人有养宠经验，");
         } else {
             sb.append("申请人暂无明确养宠经验，");
