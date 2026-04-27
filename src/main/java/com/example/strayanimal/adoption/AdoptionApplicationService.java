@@ -83,8 +83,16 @@ public class AdoptionApplicationService {
                 animal.setStatus("领养中");
                 animalRepository.save(animal);
             }
-            // 如果审核被驳回或取消，且动物当前是“领养中”，可以考虑恢复为“待领养”
-            // 这里根据实际需求决定是否恢复，暂定手动恢复或保持不变
+            // 如果审核被驳回或取消，需要检查是否还有其他“审核中”的申请
+            else if ("REJECTED".equals(status) || "CANCELLED".equals(status)) {
+                // 统计该动物是否还有其他处于“UNDER_REVIEW”状态的申请
+                long reviewCount = adoptionApplicationRepository.countByAnimal_IdAndStatus(animal.getId(), "UNDER_REVIEW");
+                // 如果没有其他正在审核的申请了，且动物当前是“领养中”，则恢复为“待领养”
+                if (reviewCount == 0 && "领养中".equals(animal.getStatus())) {
+                    animal.setStatus("待领养");
+                    animalRepository.save(animal);
+                }
+            }
         }
         
         return adoptionApplicationRepository.save(app);

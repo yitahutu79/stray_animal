@@ -15,5 +15,7 @@ public interface AdoptionApplicationRepository extends JpaRepository<AdoptionApp
     Page<AdoptionApplication> findByStatusOrderByScoreDesc(String status, Pageable pageable);
 
     long countByStatus(String status);
+
+    long countByAnimal_IdAndStatus(Long animalId, String status);
 }
 
