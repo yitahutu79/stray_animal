@@ -1,0 +1,10 @@
+# 忽略 Maven 编译生成的文件夹
+target/
+
+# 忽略 macOS 系统文件
+.DS_Store
+
+# 忽略 IDEA 配置文件（如果你用的是 IDEA，且不想上传个人配置）
+.idea/
+*.iml
+

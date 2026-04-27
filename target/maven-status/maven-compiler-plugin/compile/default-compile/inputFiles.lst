@@ -18,7 +18,9 @@
 /Users/lijie/Desktop/work/stray_animal/src/main/java/com/example/strayanimal/animal/AnimalService.java
 /Users/lijie/Desktop/work/stray_animal/src/main/java/com/example/strayanimal/auth/AuthController.java
 /Users/lijie/Desktop/work/stray_animal/src/main/java/com/example/strayanimal/common/BaseEntity.java
+/Users/lijie/Desktop/work/stray_animal/src/main/java/com/example/strayanimal/common/FileUploadController.java
 /Users/lijie/Desktop/work/stray_animal/src/main/java/com/example/strayanimal/config/SecurityConfig.java
+/Users/lijie/Desktop/work/stray_animal/src/main/java/com/example/strayanimal/config/WebConfig.java
 /Users/lijie/Desktop/work/stray_animal/src/main/java/com/example/strayanimal/donation/Donation.java
 /Users/lijie/Desktop/work/stray_animal/src/main/java/com/example/strayanimal/donation/DonationController.java
 /Users/lijie/Desktop/work/stray_animal/src/main/java/com/example/strayanimal/donation/DonationRepository.java

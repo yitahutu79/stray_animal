@@ -208,8 +208,12 @@
                         <input type="text" class="form-control" id="healthStatus">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">图片 URL</label>
-                        <input type="url" class="form-control" id="photoUrl" placeholder="https://...">
+                        <label class="form-label">图片上传</label>
+                        <input type="file" class="form-control" id="photoFile" accept="image/*">
+                        <input type="hidden" id="photoUrl">
+                        <div id="photoPreview" class="mt-2" style="display: none;">
+                            <img src="" alt="预览" style="max-width: 100%; height: auto; border-radius: 8px;">
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-6 mb-3">
@@ -343,7 +347,20 @@
         document.getElementById('weight').value = animal.weight ?? '';
         document.getElementById('color').value = animal.color || '';
         document.getElementById('healthStatus').value = animal.healthStatus || '';
-        document.getElementById('photoUrl').value = animal.photoUrl || '';
+        
+        // 处理图片预览
+        const photoUrl = animal.photoUrl || '';
+        document.getElementById('photoUrl').value = photoUrl;
+        const preview = document.getElementById('photoPreview');
+        const previewImg = preview.querySelector('img');
+        if (photoUrl) {
+            previewImg.src = photoUrl;
+            preview.style.display = 'block';
+        } else {
+            preview.style.display = 'none';
+        }
+        document.getElementById('photoFile').value = ''; // 清空文件选择
+
         document.getElementById('vaccinated').checked = !!animal.vaccinated;
         document.getElementById('neutered').checked = !!animal.neutered;
         document.getElementById('characterFeature').value = animal.characterFeature || '';
@@ -355,11 +372,40 @@
     function resetForm() {
         document.getElementById('animalForm').reset();
         document.getElementById('animalId').value = '';
+        document.getElementById('photoUrl').value = '';
+        document.getElementById('photoPreview').style.display = 'none';
     }
 
     async function saveAnimal(event) {
         event.preventDefault();
         const id = document.getElementById('animalId').value;
+        
+        // 先处理图片上传
+        const fileInput = document.getElementById('photoFile');
+        let photoUrl = document.getElementById('photoUrl').value;
+        
+        if (fileInput.files.length > 0) {
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                const uploadResp = await fetch(`${API_BASE}/api/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (uploadResp.ok) {
+                    photoUrl = await uploadResp.text();
+                } else {
+                    const errorMsg = await uploadResp.text();
+                    alert(`图片上传失败：${errorMsg}`);
+                    return;
+                }
+            } catch (err) {
+                alert(`图片上传发生错误：${err.message}`);
+                return;
+            }
+        }
+
         const body = {
             name: document.getElementById('name').value,
             species: document.getElementById('species').value,
@@ -369,7 +415,7 @@
             weight: document.getElementById('weight').value ? Number(document.getElementById('weight').value) : null,
             color: document.getElementById('color').value,
             healthStatus: document.getElementById('healthStatus').value,
-            photoUrl: document.getElementById('photoUrl').value,
+            photoUrl: photoUrl,
             vaccinated: document.getElementById('vaccinated').checked,
             neutered: document.getElementById('neutered').checked,
             characterFeature: document.getElementById('characterFeature').value,
@@ -412,6 +458,21 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         loadAnimals();
+        
+        // 图片选择预览
+        document.getElementById('photoFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const preview = document.getElementById('photoPreview');
+                    const previewImg = preview.querySelector('img');
+                    previewImg.src = event.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     });
 
     function logout() {

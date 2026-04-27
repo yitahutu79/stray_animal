@@ -8,6 +8,7 @@ com/example/strayanimal/adoption/AdoptionFollowupRepository.class
 com/example/strayanimal/adoption/AdoptionEvaluationUtil.class
 com/example/strayanimal/auth/AuthController$RegisterRequest.class
 com/example/strayanimal/animal/Animal.class
+com/example/strayanimal/common/FileUploadController.class
 com/example/strayanimal/donation/DonationRepository.class
 com/example/strayanimal/stats/StatsController.class
 com/example/strayanimal/adoption/AdoptionScoreCalculator.class
@@ -19,6 +20,7 @@ com/example/strayanimal/adoption/AdoptionApplicationRepository.class
 com/example/strayanimal/stats/StatsAnalyticsResponse$TimeBucketStat.class
 com/example/strayanimal/auth/AuthController$LoginRequest.class
 com/example/strayanimal/stats/StatsAnalyticsResponse$CategoryStat.class
+com/example/strayanimal/config/WebConfig.class
 com/example/strayanimal/adoption/AdoptionFollowupDTO.class
 com/example/strayanimal/web/HomeController.class
 com/example/strayanimal/user/User.class
