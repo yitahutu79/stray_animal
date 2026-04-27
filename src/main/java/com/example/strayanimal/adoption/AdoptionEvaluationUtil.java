@@ -21,11 +21,25 @@ public class AdoptionEvaluationUtil {
         }
 
         // 养宠经验
-        String experience = app.getExperience();
-        if (experience != null && !experience.isBlank() && !experience.equals("无经验")) {
+        String experience = (app.getExperience() != null) ? app.getExperience().trim() : "";
+        if (!experience.isEmpty() && !experience.equals("无") && !experience.equals("无经验")) {
             sb.append("申请人有养宠经验，");
         } else {
             sb.append("申请人暂无明确养宠经验，");
+        }
+
+        // 居住环境
+        String homeEnv = (app.getHomeEnv() != null) ? app.getHomeEnv().trim() : "";
+        if (!homeEnv.isEmpty()) {
+            if (homeEnv.contains("房") || homeEnv.contains("院") || homeEnv.contains("大") || homeEnv.contains("宽敞")) {
+                sb.append("居住环境描述较好，");
+            } else if (homeEnv.contains("合租") || homeEnv.contains("小") || homeEnv.contains("公寓")) {
+                sb.append("居住环境为公寓或合租，需关注空间是否充足，");
+            } else {
+                sb.append("已提供居住环境描述，");
+            }
+        } else {
+            sb.append("未提供居住环境描述，");
         }
 
         // 其他宠物
