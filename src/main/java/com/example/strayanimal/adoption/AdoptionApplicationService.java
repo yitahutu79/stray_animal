@@ -70,14 +70,23 @@ public class AdoptionApplicationService {
                 .orElseThrow(() -> new IllegalArgumentException("申请不存在"));
         app.setStatus(status);
         app.setRejectReason(rejectReason);
-        // 如果审核通过，则将动物状态更新为“已领养”，防止二次领养
-        if ("APPROVED".equals(status)) {
-            Animal animal = app.getAnimal();
-            if (animal != null) {
+        
+        Animal animal = app.getAnimal();
+        if (animal != null) {
+            // 如果审核通过，则将动物状态更新为“已领养”，防止二次领养
+            if ("APPROVED".equals(status)) {
                 animal.setStatus("已领养");
                 animalRepository.save(animal);
+            } 
+            // 如果开始审核，则将动物状态更新为“领养中”，前台会禁用该动物的申请按钮
+            else if ("UNDER_REVIEW".equals(status)) {
+                animal.setStatus("领养中");
+                animalRepository.save(animal);
             }
+            // 如果审核被驳回或取消，且动物当前是“领养中”，可以考虑恢复为“待领养”
+            // 这里根据实际需求决定是否恢复，暂定手动恢复或保持不变
         }
+        
         return adoptionApplicationRepository.save(app);
     }
 

@@ -351,6 +351,7 @@
                 <td class="small text-muted">${formatDateTime(app.createTime)}</td>
                 <td>
                     <div class="d-grid gap-2">
+                        ${app.status === 'SUBMITTED' ? `<button class="btn btn-sm btn-info text-white" onclick="startReview(${app.id})">开始审核</button>` : ''}
                         <button class="btn btn-sm btn-success" onclick="approve(${app.id})">通过</button>
                         <button class="btn btn-sm btn-outline-danger" onclick="reject(${app.id})">驳回</button>
                         ${app.status === 'APPROVED' ? `<button class="btn btn-sm btn-outline-primary" onclick="openFollowupModal(${app.id})">回访记录</button>` : ''}
@@ -359,6 +360,15 @@
             `;
             tbody.appendChild(tr);
         });
+    }
+
+    async function startReview(id) {
+        const resp = await fetch(`${API_BASE}/api/adoptions/${id}/status?status=UNDER_REVIEW`, { method: 'PUT' });
+        if (resp.ok) {
+            loadApplications();
+        } else {
+            alert(`操作失败：${await resp.text()}`);
+        }
     }
 
     async function approve(id) {

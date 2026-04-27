@@ -938,6 +938,15 @@
         return type || '回访';
     }
 
+    function getAdoptionStatusLabel(status) {
+        if (status === 'SUBMITTED') return '<span class="badge bg-warning text-dark">待审核</span>';
+        if (status === 'UNDER_REVIEW') return '<span class="badge bg-info text-dark">审核中</span>';
+        if (status === 'APPROVED') return '<span class="badge bg-success">已通过</span>';
+        if (status === 'REJECTED') return '<span class="badge bg-danger">已驳回</span>';
+        if (status === 'CANCELLED') return '<span class="badge bg-secondary">已取消</span>';
+        return status || '-';
+    }
+
     function getStatusMeta(statusText) {
         if (statusText === '待领养') return { className: 'success', button: 'primary', canApply: true };
         if (statusText === '领养中') return { className: 'warning', button: 'outline-secondary', canApply: false };
@@ -1262,7 +1271,7 @@
             tr.innerHTML = `
                 <td>${app.id}</td>
                 <td>${app.animalName || '-'}</td>
-                <td>${app.status || '-'}</td>
+                <td>${getAdoptionStatusLabel(app.status)}</td>
                 <td>${app.score ?? '-'}</td>
                 <td>${formatDateTime(app.createTime)}</td>
                 <td>${app.status === 'APPROVED' ? '您符合领养标准' : (app.status === 'REJECTED' ? (app.rejectReason || '') : '')}</td>
